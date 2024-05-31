@@ -1,0 +1,15 @@
+```plaintext
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.log
+*.pot
+*.swp
+*.swo
+*.bak
+*.tmp
+*.env
+```

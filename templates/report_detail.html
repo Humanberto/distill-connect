@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    {% extends "base.html" %}
+    
+    {% block title %}Report Details{% endblock %}
+    <div class="container">
+        {% block content %}
+        <h1 class="mt-4">Report Details</h1>
+        <p><strong>Title:</strong> {{ report.title }}</p>
+        <p><strong>Date:</strong> {{report.date }}</p>
+        <p><strong>Details:</strong></p>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    {% for header in report.details[0] %}
+                        <th>{{ header }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in report.details[1:] %}
+                    <tr data-index="{{ loop.index0 }}">
+                        {% for cell in row %}
+                        {% if loop.index == 6 %} <!-- Assuming 6th column is PAR -->
+                        <td>
+                            <input type="number" class="form-control par-input" value="{{ cell }}" data-index="{{ loop.index0 }}">
+                        </td>
+                        {% elif loop.index == 7 %} <!-- Assuming 7th column is POs -->
+                        <td>
+                            <input type="number" class="form-control pos-input" value="{{ cell }}" data-index="{{ loop.index0 }}">
+                        </td>
+                        {% else %}
+                        <td>{{ cell }}</td>
+                        {% endif %}
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- <pre>{{report.details}}</pre> -->
+        <button class="btn btn-primary" onclick="window.print()">Print</button>
+        <button class="btn btn-danger" onclick="deleteReport({{ report.id }})">Delete</button>
+        {% endblock %}
+    </div>
+</body>
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const parInputs = document.querySelectorAll('.par-input');
+        const posInputs = document.querySelectorAll('.pos-input');
+
+        function updateTotals() {
+            parInputs.forEach((input, index) => {
+                const rowIndex = input.getAttribute('data-index');
+                const parValue = parseFloat(input.value) || 0;
+                const posValue = parseFloat(posInputs[index].value) || 0;
+                const countValue = parseFloat(document.querySelector(`tbody tr:nth-child(${parseInt(rowIndex) + 2}) td:nth-child(5)`).innerText) || 0;
+                const totalCell = document.querySelector(`tbody tr:nth-child(${parseInt(rowIndex) + 2}) td:nth-child(8)`); // Adjust index based on actual position of Total column
+                totalCell.innerText = countValue - parValue - posValue;
+            });
+        }
+
+        parInputs.forEach(input => {
+            input.addEventListener('input', updateTotals);
+        });
+
+        posInputs.forEach(input => {
+            input.addEventListener('input', updateTotals);
+        });
+    });
+
+    function deleteReport(reportId) {
+        fetch('/report/${reportId}/delete', {method: 'DELETE'})
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = '/reports';
+                } else {
+                    alert('Error deleting report');
+                }
+            });
+        }
+</script>
+
+</html>

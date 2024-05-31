@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    {% extends "base.html" %}
+    
+    {% block title %}View Reports{% endblock %}
+    <div class="container">
+        {% block content %}
+        <h1 class="mt-4">All Reports</h1>
+        <ul class="list-group mt-4">
+            {% for report in reports %}
+            <li class="list-group-item">
+                <a href="/report{{ report.id}}">{{ report.title}}</a>
+                <button class="btn btn-danger btn-sm float-right" onclick="deleteReport({{ report.id}})">delete</button>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endblock %}
+    </div>
+</body>
+
+<script>
+    function deleteReport(reportId) {
+        fetch('/report/${reportId}/delete', {method: 'DELETE'})
+            .then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    alert('Failed to delete report.')
+                }
+            });
+    }
+</script>
+
+</html>
