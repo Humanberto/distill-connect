@@ -1,0 +1,5 @@
+   ```plaintext
+   Flask
+   pandas
+   python-dotenv
+   ```
