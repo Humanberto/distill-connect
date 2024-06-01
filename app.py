@@ -19,7 +19,7 @@ Probably only about 20% is my work. But I did type it all in order to get used t
 from flask import Flask, render_template, request, redirect, url_for
 # import os
 import report_manager
-from report_manager import create_report, get_report, delete_report
+from report_manager import save_reports, load_reports, create_report, get_report, delete_report
 
 app = Flask(__name__)
 
@@ -49,7 +49,7 @@ def report_detail(report_id):
             report['details'][i][7] = pos
             report['details'][i][8] = report['details'][i][0] - par - pos
             
-        report_manager.save_reports()
+        save_reports()
         
     sort_by = request.args.get('sort_by')
     if sort_by:
@@ -101,8 +101,11 @@ def instructions():
 
 @app.route('/report/<int:report>/delete', methods=['DELETE'])
 def delete_report_route(report_id):
-    delete_report(report_id)
-    return '', 204
+    print(f"Deleting report with ID: {report_id}")  # Debug statement
+    report_manager.delete_report(report_id)
+    return redirect(url_for('view_reports'))
+    # delete_report(report_id)
+    # return '', 204
     # return redirect(url_for('view_reports'))
     
     # report_manager.delete_report(report_id)
