@@ -35,51 +35,66 @@
         <p><strong>Title:</strong> {{ report.title }}</p>
         <p><strong>Date:</strong> {{report.date }}</p>
         <p><strong>Details:</strong></p>
-        <input type="text" id="'searchInput" onkeyup="filterTable()" placeholder="Search or items...">
-        <table class="table table-striped" id = "reportTable", border="1">
-            <thead>
-                <tr>
-                    {% for header in report.details[0] %}
-                        <th onclick="sortTable({{ loop.index0}})">{{ header }}</th>
-                    {% endfor %}
-                </tr>
-            </thead>
-            <tbody>
-                {% for row in report.details[1:] %}
+
+        <form method="GET" action="{{ url_for('report_detail', report_id=report.id) }}">
+            <input type="text" name="filter" onkeyup="filterTable()" placeholder="Search or items..." value="{{ request.args.get('filter', '') }}">
+            <button type="submit">Filter</button>
+        </form>
+        
+        <form method="'POST" action="{{ url_for('report_detail', report_id=report.id) }}">
+            <table class="table table-striped" id = "reportTable", border="1">
+                <thead>
+                    <tr>
+                        {% for header in report.details[0] %}
+                            <th><a href="{{ url_for('report_detail', report_id=report.id, sort_by=header) }}"></a>{{ header }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in report.details[1:] %}
                     <tr data-index="{{ loop.index0 }}">
                         {% for cell in row %}
                             {% if loop.index == 6 %} <!-- Assuming 6th column is PAR -->
                             <td>
-                                <input type="number" class="form-control par-input" value="{{ cell }}" data-index="{{ loop.index0 }}">
+                                <input type="number" class="form-control par-input" value="{{ cell }}">
                             </td>
                             {% elif loop.index == 7 %} <!-- Assuming 7th column is POs -->
                             <td>
-                                <input type="number" class="form-control pos-input" value="{{ cell }}" data-index="{{ loop.index0 }}">
+                                <input type="number" class="form-control pos-input" value="{{ cell }}">
                             </td>
                             {% else %}
                             <td>{{ cell }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
-                {% endfor %}
-            <!-- </tbody> Use this instead?
-            <tbody>
-                {% for row in report.details[1:] %}
-                <tr>
-                    {% for cell in row %}
-                    <td>{{ cell }}</td>
                     {% endfor %}
-                </tr>
-                {% endfor %}
-            </tbody> -->
-        </table>
+                    <!-- </tbody> Use this instead?
+                            <tbody>
+                                {% for row in report.details[1:] %}
+                                <tr>
+                                    {% for cell in row %}
+                                    <td>{{ cell }}</td>
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </tbody> -->
+                    </tbody>
+            </table>
+            <button type="submit" class="btn btn-primary">Update</button>
+        </form>
+            
+            
 
         <!-- <pre>{{report.details}}</pre> -->
         <button class="btn btn-primary" onclick="window.print()">Print</button>
-        <button class="btn btn-danger" onclick="deleteReport({{ report.id }})">Delete</button>
+        <form method="POST" action="{{ url_for('delete_report_route', report_id=report.id) }}" style="display:inline;"
+            <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
         {% endblock %}
     </div>
-
+</body>
+</html>
+<!-- 
 <script>
 
     // document.querySelectorAll('input').forEach(input => {
@@ -131,7 +146,7 @@
             }
 
             sortDirection[column] = !sortDirection[column];
-            const direction = sortDirection[column]  ? 'asc' : 'desc'; // sort direction
+            const direction = sortDirection[column] ? 'asc' : 'desc'; // sort direction
             sortIndicators[column].className = `sort-indicator ${direction}`
 
             rows.sort((a, b) => {
@@ -147,22 +162,22 @@
         }
 
         parInputs.forEach(input => {
-                input.addEventListener('input', updateTotals);
-            });
+            input.addEventListener('input', updateTotals);
+        });
 
-            posInputs.forEach(input => {
-                input.addEventListener('input', updateTotals);
-            });
+        posInputs.forEach(input => {
+            input.addEventListener('input', updateTotals);
+        });
 
-        window.deleteReport = function(reportId) {
-            fetch(`/report/${reportId}/delete`, {method: 'POST'})
-            .then(reponse => {
-                if (reponse.ok) {
-                    window.location.href = '/reports';
+        window.deleteReport = function (reportId) {
+            fetch(`/report/${reportId}/delete`, { method: 'POST' })
+                .then(reponse => {
+                    if (reponse.ok) {
+                        window.location.href = '/reports';
                     } else {
                         alert('Error deleting report');
                     }
-            });
+                });
         }
     });
 
@@ -177,7 +192,5 @@
     //             }
     //         });
     //     }
-    
-</script>
-</body>
-</html>
+
+</script> -->
