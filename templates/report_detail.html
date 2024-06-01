@@ -88,9 +88,10 @@
         <!-- <pre>{{report.details}}</pre> -->
         <button class="btn btn-primary" onclick="window.print()">Print</button>
         <p>Deleting report with ID: {{ report.id }}</p> <!-- Debug statement -->
-        <form method="POST" action="{{ url_for('delete_report_route', report_id=report.id) }}" style="display:inline;"
+        <form method="POST" action="{{ url_for('delete_report_route', report_id=report.id) }}" style="display:inline;">
             <button type="submit" class="btn btn-danger">Delete</button>
         </form>
+
         {% endblock %}
     </div>
 </body>
