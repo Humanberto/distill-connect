@@ -100,9 +100,9 @@ def instructions():
 
 
 @app.route('/report/<int:report>/delete', methods=['POST'])
-def delete_report_route(report_id):
-    print(f"Deleting report with ID: {report_id}")  # Debug statement
-    report_manager.delete_report(report_id)
+def delete_report_route(report):
+    print(f"Deleting report with ID: {report}")  # Debug statement
+    report_manager.delete_report(report)
     return redirect(url_for('view_reports'))
     # delete_report(report_id)
     # return '', 204
