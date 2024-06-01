@@ -7,12 +7,14 @@ DATE: June of 2024
 
 import csv
 import pandas as pd
+from datetime import datetime
+import json
 
 '''
 This section will manage the list of reports created.
 '''
 
-
+REPORTS_FILE ='reports.json'
 reports =[] #this will be the list of reports created
 
 def create_report(file):
@@ -66,20 +68,38 @@ def create_report(file):
     except Exception as e:
         print(f"Error reading csv file: {e}")
         return None
-    
+    report_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     report = {
         'id': report_id,
         'title': file.filename,
-        'date': '2024-05-27',
+        'date': report_date,
         'details': details        
         }
     
     reports.append(report)
+    save_reports()
     return report, report_id
 
 '''
 locate report by id 
 '''
+
+def save_reports():
+    with open(REPORTS_FILE, 'w') as file:
+        json.dump(reports, file)
+        
+        
+def load_reports():
+    global reports
+    try:
+        with open(REPORTS_FILE, 'r') as file:
+            reports = json.load(file)
+    except FileNotFoundError():
+        reports = []
+        
+load_reports()
+            
+
 
 def get_report(report_id):
     return next((r for r in reports if r['id'] == report_id), None) # Learned this with the Mimo app. YAY!
@@ -92,6 +112,7 @@ function to delete a report using report_id to locate it
 def delete_report(report_id):
     global reports
     reports = [r for r in reports if r['id'] != report_id]
+    save_reports()
     
 # def main():
 #     create_report(file)

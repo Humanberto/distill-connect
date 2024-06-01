@@ -38,22 +38,22 @@ def view_reports():
 
 @app.route('/report/<int:report_id>')
 def report_detail(report_id):
-    report = report_manager.get_report(report_id)
+    report = get_report(report_id)
     # report = next((r for r in reports if r['id'] == report_id), None) #------ moved this to report_manager so it's easier to find/change -----------
     return render_template('report_detail.html', report=report)
 
 
 @app.route('/create', methods=['GET', 'POST'])
-def create_report():
+def create_report_route():
     if request.method == 'POST':
         # print(request) # testing
         file = request.files['file']
         if file:
-            report = report_manager.create_report(file)
-            if report:
-                return redirect(url_for('report_detail', report_id=report['id']))
-            else:
-                return "Error processing file", 500
+            report = create_report(file)
+            return redirect(url_for('report_detail', report_id=report['id']))
+            
+        else:
+            return "Error processing file", 500
             
     return render_template('create_report.html')
          
@@ -76,11 +76,14 @@ def instructions():
 
 
 @app.route('/report/<int:report>/delete', methods=['DELETE'])
-def delete_report(report_id):
-    report_manager.delete_report(report_id)
+def delete_report_route(report_id):
+    delete_report(report_id)
+    return redirect(url_for('view_reports'))
+    
+    # report_manager.delete_report(report_id)
     # global reports
     # reports = [r for r in reports if r['id'] != report_id] #------ moved this to report_manager so it's easier to find/change -----------
-    return '', 204
+    # return '', 204
 
 
 if __name__ == '__main__':
