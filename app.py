@@ -81,7 +81,8 @@ def instructions():
 @app.route('/report/<int:report>/delete', methods=['DELETE'])
 def delete_report_route(report_id):
     delete_report(report_id)
-    return redirect(url_for('view_reports'))
+    return '', 204
+    # return redirect(url_for('view_reports'))
     
     # report_manager.delete_report(report_id)
     # global reports

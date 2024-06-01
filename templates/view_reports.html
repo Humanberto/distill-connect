@@ -23,11 +23,10 @@
         </ul>
         {% endblock %}
     </div>
-</body>
 
 <script>
     function deleteReport(reportId) {
-        fetch('/report/${reportId}/delete', {method: 'DELETE'})
+        fetch(`/report/${reportId}/delete`, { method: 'POST' })
             .then(response => {
                 if (response.ok) {
                     window.location.reload();
@@ -37,5 +36,5 @@
             });
     }
 </script>
-
+</body>
 </html>
