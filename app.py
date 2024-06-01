@@ -36,18 +36,18 @@ def view_reports():
     return render_template('view_reports.html', reports=report_manager.reports)
 
 
-@app.route('/report/<int:report_id>')
+@app.route('/report/<int:report_id>', method=['GET', 'POST'])
 def report_detail(report_id):
     report = get_report(report_id)
     # report = next((r for r in reports if r['id'] == report_id), None) #------ moved this to report_manager so it's easier to find/change -----------
     
     if request.method == 'POST':
-        for i, row in enumerate(report['details'][1:0], start=1):
-            par = request.form.get(f'par-{i}', type=int, dafault=0)
+        for i, row in enumerate(report['details'][1:], start=1):
+            par = request.form.get(f'par-{i}', type=int, default=0)
             pos = request.form.get(f'pos-{i}', type=int, default=0)
             report['details'][i][6] = par
             report['details'][i][7] = pos
-            report['details'][i][8] = report['details'][i][0] - par - pos
+            report['details'][i][8] = report['details'][i][4] - par - pos
             
         save_reports()
         
@@ -99,7 +99,7 @@ def instructions():
     return render_template('instructions.html')
 
 
-@app.route('/report/<int:report>/delete', methods=['DELETE'])
+@app.route('/report/<int:report>/delete', methods=['POST'])
 def delete_report_route(report_id):
     print(f"Deleting report with ID: {report_id}")  # Debug statement
     report_manager.delete_report(report_id)
