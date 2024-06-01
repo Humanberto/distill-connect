@@ -36,7 +36,7 @@ def view_reports():
     return render_template('view_reports.html', reports=report_manager.reports)
 
 
-@app.route('/report/<int:report_id>', methodS=['GET', 'POST'])
+@app.route('/report/<int:report_id>', methods=['GET', 'POST'])
 def report_detail(report_id):
     report = get_report(report_id)
     # report = next((r for r in reports if r['id'] == report_id), None) #------ moved this to report_manager so it's easier to find/change -----------
@@ -99,7 +99,7 @@ def instructions():
     return render_template('instructions.html')
 
 
-@app.route('/report/<int:report>/delete', methods=['POST'])
+@app.route('/report/<int:report_id>/delete', methods=['POST'])
 def delete_report_route(report_id):
     print(f"Deleting report with ID: {report_id}")  # Debug statement
     report_manager.delete_report(report_id)
