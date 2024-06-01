@@ -16,7 +16,7 @@
         <ul class="list-group mt-4">
             {% for report in reports %}
             <li class="list-group-item">
-                <a href="/report{{ report.id}}">{{ report.title}}</a>
+                <a href="{{ url_for('report_detail', report_id=report.id) }}"> {{ report.title }} - {{ report.date }}</a>
                 <button class="btn btn-danger btn-sm float-right" onclick="deleteReport({{ report.id}})">delete</button>
             </li>
             {% endfor %}

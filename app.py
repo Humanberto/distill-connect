@@ -19,6 +19,7 @@ Probably only about 20% is my work. But I did type it all in order to get used t
 from flask import Flask, render_template, request, redirect, url_for
 import os
 import report_manager
+from report_manager import create_report, get_report, delete_report
 
 app = Flask(__name__)
 

@@ -23,7 +23,7 @@ def create_report(file):
         # learned the above from another student
         
         
-        df = df[df['CATEGORY NAME:'].str.contains('Finished Product')] # trying to filter only Finished Products. Not working
+        df = df[df['CATEGORY NAME:'].str.contains('Finished Product', na=False)] # trying to filter only Finished Products. Not working
         
         # Convert the COUNT: column to integer ---- FROM CHATGPT
         df['COUNT:'] = pd.to_numeric(df['COUNT:'], errors='coerce').fillna(0).astype(int)
@@ -75,7 +75,7 @@ def create_report(file):
         }
     
     reports.append(report)
-    return report
+    return report, report_id
 
 '''
 locate report by id 
@@ -93,3 +93,10 @@ def delete_report(report_id):
     global reports
     reports = [r for r in reports if r['id'] != report_id]
     
+# def main():
+#     create_report(file)
+#     get_report(report_id)
+#     delete_report(report_id)
+    
+# if __name__ == '__main__':
+#     main()

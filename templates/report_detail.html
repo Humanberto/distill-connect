@@ -15,11 +15,12 @@
         <p><strong>Title:</strong> {{ report.title }}</p>
         <p><strong>Date:</strong> {{report.date }}</p>
         <p><strong>Details:</strong></p>
-        <table class="table table-striped">
+        <input type="text" id="'searchInput" onkeyup="filterTable()" placeholder="Search or items...">
+        <table class="table table-striped" id = "reportTable", border="1">
             <thead>
                 <tr>
                     {% for header in report.details[0] %}
-                        <th>{{ header }}</th>
+                        <th onclick="sortTable({{ loop.index0}})">{{ header }}</th>
                     {% endfor %}
                 </tr>
             </thead>
@@ -41,7 +42,16 @@
                         {% endfor %}
                     </tr>
                 {% endfor %}
-            </tbody>
+            <!-- </tbody> Use this instead?
+            <tbody>
+                {% for row in report.details[1:] %}
+                <tr>
+                    {% for cell in row %}
+                    <td>{{ cell }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody> -->
         </table>
 
         <!-- <pre>{{report.details}}</pre> -->
@@ -53,9 +63,47 @@
 
 <script>
 
+    document.querySelectorAll('input').forEach(input => {
+        input.addEventListener('input', updateTotals);
+    })
     document.addEventListener('DOMContentLoaded', function () {
         const parInputs = document.querySelectorAll('.par-input');
         const posInputs = document.querySelectorAll('.pos-input');
+
+        function filterTable() {
+            const input = document.getElementById("searchInput");
+            const filter = input.value.toLowerCase();
+            const table = document.getElementById("reportTable");
+            const tbody = table.tBodies[0];
+            const rows = Array.from(tbody.rows);
+
+            rows.forEach(row => {
+                const cells = Array.from(row.cells);
+                const match = cells.some(cell => cell.innerText.toLowerCase().includes(filter));
+                row.style.display = match ? "" : "none"; // show or hide row
+            });
+
+
+            })
+
+
+        function sortTable(column) {
+            const table = document.getElementById("reportTable");
+            const tbody = table.tBodies[0];
+            const rows = Array.from(tbody.rows);
+
+            const direction = sortDirection[column] = !sortDirection[column];
+            rows.sort((a, b) => {
+                const cellA = a.cells[column].innerText;
+                const cellB = b.cells[column].innerText;
+                return direction ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
+            });
+
+            while (tbody.firstChild) {
+                tbody.removeChild(tbody.firstChild);
+            }
+            rows.forEach(row => body.appendChild(row));
+        }
 
         function updateTotals() {
             parInputs.forEach((input, index) => {
