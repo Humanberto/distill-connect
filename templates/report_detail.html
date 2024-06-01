@@ -46,7 +46,10 @@
                 <thead>
                     <tr>
                         {% for header in report.details[0] %}
-                            <th><a href="{{ url_for('report_detail', report_id=report.id, sort_by=header) }}"></a>{{ header }}</th>
+                            <th>
+                                <button type="submit" name="sort" value="{{ header }}">{{ header }}</button>
+                                <!-- <a href="{{ url_for('report_detail', report_id=report.id, sort_by=header) }}"></a>{{ header }} -->
+                            </th>
                         {% endfor %}
                     </tr>
                 </thead>

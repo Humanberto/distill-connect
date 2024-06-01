@@ -42,26 +42,36 @@ def report_detail(report_id):
     # report = next((r for r in reports if r['id'] == report_id), None) #------ moved this to report_manager so it's easier to find/change -----------
     
     if request.method == 'POST':
-        for i, row in enumerate(report['details'][1:], start=1):
-            par = request.form.get(f'par-{i}', type=int, default=0)
-            pos = request.form.get(f'pos-{i}', type=int, default=0)
-            report['details'][i][6] = par
-            report['details'][i][7] = pos
-            report['details'][i][8] = report['details'][i][4] - par - pos
+        if 'update' in request.form:
+            for i, row in enumerate(report['details'][1:], start=1):
+                par = request.form.get(f'par-{i}', type=int, default=0)
+                pos = request.form.get(f'pos-{i}', type=int, default=0)
+                report['details'][i][6] = par
+                report['details'][i][7] = pos
+                report['details'][i][8] = report['details'][i][4] - par - pos                
+            save_reports()
+        elif 'sort' in request.form:
+            sort_by = request.form['sort']
+            sort_index = report['details'][0].index(sort_by)
+            report['details'] = [report['details'][0]] + sorted(report['details'][1:], key=lambda x: x[sort_index])
+        elif'filter' in request.form:
+            filter_term = request.form['filter']
+            report['details'] = [report['details'][0]] + [row for row in report['details'][1:] if filter_term.lower() in str(row).lower()]
             
-        save_reports()
-        
-    sort_by = request.args.get('sort_by')
-    if sort_by:
-        sort_index = report['details'][0].index(sort_by)
-        report['details'] = [report['details'][0]] + sorted(report['details'][1:], key=lambda x: x[sort_index])
-        
-    # Filtering
-    filter_term = request.args.get('filter')
-    if filter_term:
-        report['details'] = [report['details'][0]] + [row for row in report['details'][1:] if filter_term.lower() in str(row).lower()]
-    
     return render_template('report_detail.html', report=report)
+    
+        
+    # sort_by = request.args.get('sort_by')
+    # if sort_by:
+    #     sort_index = report['details'][0].index(sort_by)
+    #     report['details'] = [report['details'][0]] + sorted(report['details'][1:], key=lambda x: x[sort_index])
+        
+    # # Filtering
+    # filter_term = request.args.get('filter')
+    # if filter_term:
+    #     report['details'] = [report['details'][0]] + [row for row in report['details'][1:] if filter_term.lower() in str(row).lower()]
+    
+
 
 
 @app.route('/create', methods=['GET', 'POST'])
