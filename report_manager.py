@@ -5,7 +5,7 @@ DATE: June of 2024
 
 '''
 
-import csv
+# import csv
 import pandas as pd
 from datetime import datetime
 import json
@@ -31,17 +31,20 @@ def load_reports():
     except FileNotFoundError:
         reports = []
         
-load_reports()
+# load_reports()
 
 
 def create_report(file):
     report_id = len(reports) + 1
     
     try:
+                
         df = pd.read_csv(file, header=5, usecols=['CATEGORY NAME:', 'ITEM:', 'BOTT. TYPE/SIZE:', 'LOCATION:', 'COUNT:'])
         # learned the above from another student
+        print(df)
         
-        
+        # df.drop(columns= not ['CATEGORY NAME:', 'ITEM:', 'BOTT. TYPE/SIZE:', 'LOCATION:', 'COUNT:'])
+        print(df)
         df = df[df['CATEGORY NAME:'].str.contains('Finished Product', na=False)] # trying to filter only Finished Products. Not working
         
         # Convert the COUNT: column to integer ---- FROM CHATGPT
@@ -64,7 +67,6 @@ def create_report(file):
         
         details.insert(0, df.columns.tolist())
 
-        
         # for row in df.itertuples():
                 
         #     my_col = [index for index in row if 'Finished Product' or 'Supplies' or 'Raw Materials' in row[0]]
@@ -85,6 +87,7 @@ def create_report(file):
     except Exception as e:
         print(f"Error reading csv file: {e}")
         return None
+    
     report_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     report = {
         'id': report_id,
@@ -121,3 +124,4 @@ def delete_report(report_id):
     
 # if __name__ == '__main__':
 #     main()
+

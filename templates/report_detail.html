@@ -1,33 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <style>
+    <title>Report Details</title>
+    <!-- <style>
         th {
             cursor: pointer;
             position: relative;
         }
     
-        th .sort-indicator {
+        th.sort-indicator {
             position: absolute;
             right: 8px;
             opacity: 0.5;
         }
     
-        th .sort-indicator.asc::before {
+        th.sort-indicator.asc::before {
             content: '▲';
         }
     
-        th .sort-indicator.desc::before {
+        th.sort-indicator.desc::before {
             content: '▼';
         }
-        </style>
+        </style> -->
 </head>
+
 <body>
     {% extends "base.html" %}
-    
+
     {% block title %}Report Details{% endblock %}
     <div class="container">
         {% block content %}
@@ -37,19 +39,20 @@
         <p><strong>Details:</strong></p>
 
         <form method="GET" action="{{ url_for('report_detail', report_id=report.id) }}">
-            <input type="text" name="filter" onkeyup="filterTable()" placeholder="Search or items..." value="{{ request.args.get('filter', '') }}">
+            <input type="text" name="filter" onkeyup="filterTable()" placeholder="Search or items..."
+                value="{{ request.args.get('filter', '') }}">
             <button type="submit">Filter</button>
         </form>
-        
-        <form method="'POST" action="{{ url_for('report_detail', report_id=report.id) }}">
-            <table class="table table-striped" id = "reportTable", border="1">
+
+        <form method="POST" action="{{ url_for('report_detail', report_id=report.id) }}">
+            <table class="table table-striped" id="reportTable">
                 <thead>
                     <tr>
                         {% for header in report.details[0] %}
-                            <th>
-                                <button type="submit" name="sort" value="{{ header }}">{{ header }}</button>
-                                <!-- <a href="{{ url_for('report_detail', report_id=report.id, sort_by=header) }}"></a>{{ header }} -->
-                            </th>
+                        <th>
+                            <button type="submit" name="sort" value="{{ header }}">{{ header }}</button>
+                            <!-- <a href="{{ url_for('report_detail', report_id=report.id, sort_by=header) }}"></a>{{ header }} -->
+                        </th>
                         {% endfor %}
                     </tr>
                 </thead>
@@ -57,17 +60,17 @@
                     {% for row in report.details[1:] %}
                     <tr data-index="{{ loop.index0 }}">
                         {% for cell in row %}
-                            {% if loop.index == 6 %} <!-- Assuming 6th column is PAR -->
-                            <td>
-                                <input type="number" class="form-control par-input" value="{{ cell }}">
-                            </td>
-                            {% elif loop.index == 7 %} <!-- Assuming 7th column is POs -->
-                            <td>
-                                <input type="number" class="form-control pos-input" value="{{ cell }}">
-                            </td>
-                            {% else %}
-                            <td>{{ cell }}</td>
-                            {% endif %}
+                        {% if loop.index == 6 %} <!-- Assuming 6th column is PAR -->
+                        <td>
+                            <input type="number" class="form-control par-input" value="{{ cell }}">
+                        </td>
+                        {% elif loop.index == 7 %} <!-- Assuming 7th column is POs -->
+                        <td>
+                            <input type="number" class="form-control pos-input" value="{{ cell }}">
+                        </td>
+                        {% else %}
+                        <td>{{ cell }}</td>
+                        {% endif %}
                         {% endfor %}
                     </tr>
                     {% endfor %}
@@ -81,12 +84,12 @@
                                 </tr>
                                 {% endfor %}
                             </tbody> -->
-                    </tbody>
+                </tbody>
             </table>
             <button type="submit" class="btn btn-primary">Update</button>
         </form>
-            
-            
+
+
 
         <!-- <pre>{{report.details}}</pre> -->
         <button class="btn btn-primary" onclick="window.print()">Print</button>
@@ -98,6 +101,7 @@
         {% endblock %}
     </div>
 </body>
+
 </html>
 <!-- 
 <script>
@@ -119,83 +123,4 @@
                 const countValue = parseFloat(document.querySelector(`tbody tr[data-index="${rowIndex}"] td:nth-child(5)`).innerText) || 0;
                 const totalCell = document.querySelector(`tbody tr[data-index="${rowIndex}"] td:nth-child(8)`);
 
-                // const totalCell = document.querySelector(`tbody tr[data-index="${rowIndex}"] td:nth-child(${parseInt(rowIndex) + 2}) td:nth-child(8)`); // Adjust index based on actual position of Total column
-                totalCell.innerText = countValue - parValue - posValue;
-            });
-        }
-
-
-        function filterTable() {
-            const input = document.getElementById("searchInput");
-            const filter = input.value.toLowerCase();
-            const table = document.getElementById("reportTable");
-            const tbody = table.tBodies[0];
-            const rows = Array.from(tbody.rows);
-
-            rows.forEach(row => {
-                const cells = Array.from(row.cells);
-                const match = cells.some(cell => cell.innerText.toLowerCase().includes(filter));
-                row.style.display = match ? "" : "none"; // show or hide row
-            });
-        }
-
-        function sortTable(column) {
-            const table = document.getElementById("reportTable");
-            const tbody = table.tBodies[0];
-            const rows = Array.from(tbody.rows);
-
-            if (!sortIndicators[column]) {
-                sortIndicators[column] = document.createElement('span');
-                sortIndicators[column].classList.add('sort-indicator');
-                document.querySelectorAll('th')[column].appendChild(sortIndicators[column])
-            }
-
-            sortDirection[column] = !sortDirection[column];
-            const direction = sortDirection[column] ? 'asc' : 'desc'; // sort direction
-            sortIndicators[column].className = `sort-indicator ${direction}`
-
-            rows.sort((a, b) => {
-                const cellA = a.cells[column].innerText;
-                const cellB = b.cells[column].innerText;
-                return direction ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
-            });
-
-            while (tbody.firstChild) {
-                tbody.removeChild(tbody.firstChild);
-            }
-            rows.forEach(row => body.appendChild(row));
-        }
-
-        parInputs.forEach(input => {
-            input.addEventListener('input', updateTotals);
-        });
-
-        posInputs.forEach(input => {
-            input.addEventListener('input', updateTotals);
-        });
-
-        window.deleteReport = function (reportId) {
-            fetch(`/report/${reportId}/delete`, { method: 'POST' })
-                .then(reponse => {
-                    if (reponse.ok) {
-                        window.location.href = '/reports';
-                    } else {
-                        alert('Error deleting report');
-                    }
-                });
-        }
-    });
-
-
-    // function deleteReport(reportId) {
-    //     fetch('/report/${reportId}/delete', {method: 'DELETE'})
-    //         .then(response => {
-    //             if (response.ok) {
-    //                 window.location.href = '/reports';
-    //             } else {
-    //                 alert('Error deleting report');
-    //             }
-    //         });
-    //     }
-
-</script> -->
+                // const totalCell =
