@@ -36,7 +36,7 @@ def view_reports():
     return render_template('view_reports.html', reports=report_manager.reports)
 
 
-@app.route('/report/<int:report_id>', method=['GET', 'POST'])
+@app.route('/report/<int:report_id>', methods=['GET', 'POST'])
 def report_detail(report_id):
     report = get_report(report_id)
     # report = next((r for r in reports if r['id'] == report_id), None) #------ moved this to report_manager so it's easier to find/change -----------
