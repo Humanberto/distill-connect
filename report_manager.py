@@ -17,6 +17,23 @@ This section will manage the list of reports created.
 REPORTS_FILE ='reports.json'
 reports =[] #this will be the list of reports created
 
+
+def save_reports():
+    with open(REPORTS_FILE, 'w') as file:
+        json.dump(reports, file)
+        
+        
+def load_reports():
+    global reports
+    try:
+        with open(REPORTS_FILE, 'r') as file:
+            reports = json.load(file)
+    except FileNotFoundError:
+        reports = []
+        
+load_reports()
+
+
 def create_report(file):
     report_id = len(reports) + 1
     
@@ -84,21 +101,7 @@ def create_report(file):
 locate report by id 
 '''
 
-def save_reports():
-    with open(REPORTS_FILE, 'w') as file:
-        json.dump(reports, file)
-        
-        
-def load_reports():
-    global reports
-    try:
-        with open(REPORTS_FILE, 'r') as file:
-            reports = json.load(file)
-    except FileNotFoundError:
-        reports = []
-        
-load_reports()
-            
+          
 
 
 def get_report(report_id):

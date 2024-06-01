@@ -48,9 +48,12 @@ def create_report_route():
     if request.method == 'POST':
         # print(request) # testing
         file = request.files['file']
+        
         if file:
-            report = create_report(file)
-            return redirect(url_for('report_detail', report_id=report['id']))
+            report, report_id = create_report(file)
+            if report:
+                return redirect(url_for('report_detail', report_id=report_id))
+            # return redirect(url_for('report_detail', report_id=report['id'])) # was giving a str TypeError
             
         else:
             return "Error processing file", 500
