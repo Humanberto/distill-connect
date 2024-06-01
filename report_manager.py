@@ -94,7 +94,7 @@ def load_reports():
     try:
         with open(REPORTS_FILE, 'r') as file:
             reports = json.load(file)
-    except FileNotFoundError():
+    except FileNotFoundError:
         reports = []
         
 load_reports()
