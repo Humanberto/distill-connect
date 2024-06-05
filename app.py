@@ -275,8 +275,7 @@ Probably only about 20% is my work. But I did type it all in order to get used t
 # =============================================================================
 '''
 
-
-from flask import Flask, request, jsonify
+from flask import Flask, render_template, request, jsonify
 import json
 
 app = Flask(__name__)
@@ -284,6 +283,17 @@ app = Flask(__name__)
 # Load reports (assuming the reports are loaded here)
 with open('reports.json', 'r') as f:
     reports = json.load(f)
+
+@app.route('/')
+def index():
+    return render_template('view_report.html', reports=reports)
+
+@app.route('/report/<int:report_id>')
+def report_detail(report_id):
+    report = next((r for r in reports if r['id'] == report_id), None)
+    if not report:
+        return "Report not found", 404
+    return render_template('report_detail.html', report=report)
 
 @app.route('/update_report/<int:report_id>', methods=['POST'])
 def update_report(report_id):
