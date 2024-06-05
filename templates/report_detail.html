@@ -53,9 +53,9 @@
                     <tr>
                         {% for cell in row %}
                         {% if loop.index == 6 %}
-                        <td><input type="number" name="par-{{ loop.parent.index }}" value="{{ cell }}"></td>
+                        <td><input type="number" name="par-{{ loop.index }}" value="{{ cell }}"></td>
                         {% elif loop.index == 7 %}
-                        <td><input type="number" name="pos-{{ loop.parent.index }}" value="{{ cell }}"></td>
+                        <td><input type="number" name="pos-{{ loop.index }}" value="{{ cell }}"></td>
                         {% else %}
                         <td>{{ cell }}</td>
                         {% endif %}
