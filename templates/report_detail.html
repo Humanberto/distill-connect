@@ -35,42 +35,119 @@
         <h1 class="mt-4">Report Details</h1>
         <p><strong>Title:</strong> {{ report.title }}</p>
         <p><strong>Date:</strong> {{ report.date }}</p>
-        <form method="POST">
-            <input type="text" id="searchInput" name="filter" placeholder="Search for items...">
-            <button type="submit" name="filter" value="filter">Filter</button>
-            <table class="table table-striped" id="reportTable">
-                <thead>
-                    <tr>
-                        {% for header in report.details[0] %}
-                        <th>
-                            <button type="submit" name="sort" value="{{ header }}">{{ header }}</button>
-                        </th>
-                        {% endfor %}
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for row in report.details[1:] %}
-                    <tr>
-                        {% for cell in row %}
-                        {% if loop.index == 6 %}
-                        <td><input type="number" name="par-{{ loop.index }}" value="{{ cell }}"></td>
-                        {% elif loop.index == 7 %}
-                        <td><input type="number" name="pos-{{ loop.index }}" value="{{ cell }}"></td>
-                        {% else %}
-                        <td>{{ cell }}</td>
-                        {% endif %}
-                        {% endfor %}
-                    </tr>
+        <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Search for items...">
+        <table class="table table-striped" id="reportTable">
+            <thead>
+                <tr>
+                    {% for header in report.details[0] %}
+                    <th onclick="sortTable({{ loop.index0 }})">{{ header }}
+                        <span id="sortIndicator-{{ loop.index0 }}" class="sort-indicator"></span>
+                    </th>
                     {% endfor %}
-                </tbody>
-            </table>
-            <button type="submit" name="update" value="update">Update</button>
-        </form>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in report.details[1:] %}
+                <tr>
+                    {% for cell in row %}
+                    {% if loop.index == 6 %}
+                    <td><input type="number" name="par-{{ loop.index }}" value="{{ cell }}" onchange="updateTotal({{ loop.parent.index }})"></td>
+                    {% elif loop.index == 7 %}
+                    <td><input type="number" name="pos-{{ loop.index }}" value="{{ cell }}" onchange="updateTotal({{ loop.parent.index }})"></td>
+                    {% else %}
+                    <td>{{ cell }}</td>
+                    {% endif %}
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button type="button" class="btn btn-primary" onclick="submitUpdates()">Update</button>
         <form method="POST" action="{{ url_for('delete_report_route', report_id=report.id) }}" style="display:inline;">
             <button type="submit" class="btn btn-danger">Delete</button>
         </form>
     </div>
     {% endblock %}
 </body>
+
+<script>
+    let sortDirection = true;
+
+    function sortTable(columnIndex) {
+        const table = document.getElementById("reportTable");
+        const tbody = table.tBodies[0];
+        const rows = Array.from(tbody.rows);
+
+        rows.sort((a, b) => {
+            const cellA = a.cells[columnIndex].innerText;
+            const cellB = b.cells[columnIndex].innerText;
+            if (sortDirection) {
+                return cellA.localeCompare(cellB, undefined, { numeric: true });
+            } else {
+                return cellB.localeCompare(cellA, undefined, { numeric: true });
+            }
+        });
+
+        while (tbody.firstChild) {
+            tbody.removeChild(tbody.firstChild);
+        }
+        rows.forEach(row => tbody.appendChild(row));
+
+        sortDirection = !sortDirection;
+        updateSortIndicators(columnIndex);
+    }
+
+    function updateSortIndicators(columnIndex) {
+        const indicators = document.querySelectorAll('.sort-indicator');
+        indicators.forEach(indicator => indicator.innerText = '');
+
+        const currentIndicator = document.getElementById(`sortIndicator-${columnIndex}`);
+        currentIndicator.innerText = sortDirection ? '▲' : '▼';
+    }
+
+    function filterTable() {
+        const input = document.getElementById("searchInput");
+        const filter = input.value.toLowerCase();
+        const table = document.getElementById("reportTable");
+        const rows = Array.from(table.tBodies[0].rows);
+
+        rows.forEach(row => {
+            const cells = Array.from(row.cells);
+            const match = cells.some(cell => cell.innerText.toLowerCase().includes(filter));
+            row.style.display = match ? "" : "none";
+        });
+    }
+
+    function updateTotal(rowIndex) {
+        const row = document.querySelector(`#reportTable tbody tr:nth-child(${rowIndex + 1})`);
+        const countCell = row.cells[4];
+        const parInput = row.querySelector(`input[name="par-${rowIndex + 1}"]`);
+        const posInput = row.querySelector(`input[name="pos-${rowIndex + 1}"]`);
+        const totalCell = row.cells[8];
+
+        const count = parseFloat(countCell.innerText) || 0;
+        const par = parseFloat(parInput.value) || 0;
+        const pos = parseFloat(posInput.value) || 0;
+
+        totalCell.innerText = count - par - pos;
+    }
+
+    function submitUpdates() {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.style.display = 'none';
+
+        document.querySelectorAll('#reportTable input').forEach(input => {
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = input.name;
+            hiddenInput.value = input.value;
+            form.appendChild(hiddenInput);
+        });
+
+        document.body.appendChild(form);
+        form.submit();
+    }
+</script>
 
 </html>
