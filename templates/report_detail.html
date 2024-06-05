@@ -49,18 +49,17 @@
                 <tr data-index="{{ loop.index0 }}">
                     {% for cell in row %}
                     {% if loop.index == 6 %}
-                    <td><input type="number" name="par-{{ loop.index0 }}" value="{{ cell }}" onchange="updateTotal({{ loop.index0 }})"></td>
+                    <td><input type="number" name="par-{{ loop.index0 }}" value="{{ cell }}" oninput="updateTotal({{ loop.index0 }})"></td>
                     {% elif loop.index == 7 %}
-                    <td><input type="number" name="pos-{{ loop.index0 }}" value="{{ cell }}" onchange="updateTotal({{ loop.index0 }})"></td>
+                    <td><input type="number" name="pos-{{ loop.index0 }}" value="{{ cell }}" oninput="updateTotal({{ loop.index0 }})"></td>
                     {% else %}
-                    <td class="total-cell">{{ cell }}</td>
+                    <td>{{ cell }}</td>
                     {% endif %}
                     {% endfor %}
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-        <button type="button" class="btn btn-primary" onclick="submitUpdates()">Update</button>
         <form method="POST" action="{{ url_for('delete_report_route', report_id=report.id) }}" style="display:inline;">
             <button type="submit" class="btn btn-danger">Delete</button>
         </form>
@@ -120,22 +119,46 @@
 
     function updateTotal(rowIndex) {
         const row = document.querySelector(`#reportTable tbody tr[data-index="${rowIndex}"]`);
-        const countCell = row.cells[4];
         const parInput = row.querySelector(`input[name="par-${rowIndex}"]`);
         const posInput = row.querySelector(`input[name="pos-${rowIndex}"]`);
-        const total = countCell.innerText - parInput.value - posInput.value;
+        const count = parseInt(row.cells[4].innerText) || 0;
+        const par = parseInt(parInput.value) || 0;
+        const pos = parseInt(posInput.value) || 0;
+        const total = count - par - pos;
 
-        const totalCell = row.querySelector('.total-cell');
+        const totalCell = row.querySelector('td:nth-child(8)');
         totalCell.innerText = total;
         if (total < 0) {
             totalCell.classList.add('negative-total');
         } else {
             totalCell.classList.remove('negative-total');
         }
+
+        // Persist changes with AJAX
+        persistChanges(rowIndex, par, pos, total);
     }
 
-    function submitUpdates() {
-        // Implement the logic to submit updates if necessary
+    function persistChanges(rowIndex, par, pos, total) {
+        const reportId = "{{ report.id }}";
+        fetch(`/update_report/${reportId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                rowIndex: rowIndex,
+                par: par,
+                pos: pos,
+                total: total
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status !== 'success') {
+                console.error('Failed to persist changes:', data.message);
+            }
+        })
+        .catch(error => console.error('Error:', error));
     }
 </script>
 </html>
