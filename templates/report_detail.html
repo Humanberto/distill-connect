@@ -9,23 +9,22 @@
             cursor: pointer;
             position: relative;
         }
-
+    
         th.sort-indicator {
             position: absolute;
             right: 8px;
             opacity: 0.5;
         }
-
+    
         th.sort-indicator.asc::before {
             content: '▲';
         }
-
+    
         th.sort-indicator.desc::before {
             content: '▼';
         }
     </style>
 </head>
-
 <body>
     {% extends "base.html" %}
 
@@ -50,9 +49,9 @@
                 <tr data-index="{{ loop.index0 }}">
                     {% for cell in row %}
                     {% if loop.index == 6 %}
-                    <td><input type="number" name="par-{{ loop.parent.index0 }}" value="{{ cell }}" onchange="updateTotal({{ loop.parent.index0 }})"></td>
+                    <td><input type="number" name="par-{{ loop.index0 }}" value="{{ cell }}" onchange="updateTotal({{ loop.index0 }})"></td>
                     {% elif loop.index == 7 %}
-                    <td><input type="number" name="pos-{{ loop.parent.index0 }}" value="{{ cell }}" onchange="updateTotal({{ loop.parent.index0 }})"></td>
+                    <td><input type="number" name="pos-{{ loop.index0 }}" value="{{ cell }}" onchange="updateTotal({{ loop.index0 }})"></td>
                     {% else %}
                     <td>{{ cell }}</td>
                     {% endif %}
@@ -121,32 +120,4 @@
         const row = document.querySelector(`#reportTable tbody tr[data-index="${rowIndex}"]`);
         const countCell = row.cells[4];
         const parInput = row.querySelector(`input[name="par-${rowIndex}"]`);
-        const posInput = row.querySelector(`input[name="pos-${rowIndex}"]`);
-        const totalCell = row.cells[8];
-
-        const count = parseFloat(countCell.innerText) || 0;
-        const par = parseFloat(parInput.value) || 0;
-        const pos = parseFloat(posInput.value) || 0;
-
-        totalCell.innerText = count - par - pos;
-    }
-
-    function submitUpdates() {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.style.display = 'none';
-
-        document.querySelectorAll('#reportTable input').forEach(input => {
-            const hiddenInput = document.createElement('input');
-            hiddenInput.type = 'hidden';
-            hiddenInput.name = input.name;
-            hiddenInput.value = input.value;
-            form.appendChild(hiddenInput);
-        });
-
-        document.body.appendChild(form);
-        form.submit();
-    }
-</script>
-
-</html>
+        const posInput = row.querySelector(`
