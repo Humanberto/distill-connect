@@ -17,7 +17,9 @@
             {% for report in reports %}
             <li class="list-group-item">
                 <a href="{{ url_for('report_detail', report_id=report.id) }}"> {{ report.title }} - {{ report.date }}</a>
-                <button class="btn btn-danger btn-sm float-right" onclick="deleteReport({{ report.id}})">delete</button>
+                <form method="POST" action="{{ url_for('delete_report_route', report_id=report.id) }}" style="display:inline;">
+                    <button type="submit" class="btn btn-danger btn-sm float-right">Delete</button>
+                </form>
             </li>
             {% endfor %}
         </ul>

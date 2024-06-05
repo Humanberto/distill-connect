@@ -43,8 +43,8 @@ def create_report(file):
         # learned the above from another student
         print(df)
         
-        df.drop(columns= not ['CATEGORY NAME:', 'ITEM:', 'BOTT. TYPE/SIZE:', 'LOCATION:', 'COUNT:'])
-        print(df)
+        # df.drop(columns= not ['CATEGORY NAME:', 'ITEM:', 'BOTT. TYPE/SIZE:', 'LOCATION:', 'COUNT:'])
+        # print(df)
         df = df[df['CATEGORY NAME:'].str.contains('Finished Product', na=False)] # trying to filter only Finished Products. Not working
         
         # Convert the COUNT: column to integer ---- FROM CHATGPT

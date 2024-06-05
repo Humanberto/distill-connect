@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Report Details</title>
-    <!-- <style>
+    <style>
         th {
             cursor: pointer;
             position: relative;
@@ -24,11 +24,11 @@
         th.sort-indicator.desc::before {
             content: '▼';
         }
-        </style> -->
+        </style>
 </head>
-
+<!--
 <body>
-    {% extends "base.html" %}
+    <!-- {% extends "base.html" %}
 
     {% block title %}Report Details{% endblock %}
     <div class="container">
@@ -83,7 +83,7 @@
                                     {% endfor %}
                                 </tr>
                                 {% endfor %}
-                            </tbody> -->
+                            </tbody>
                 </tbody>
             </table>
             <button type="submit" class="btn btn-primary">Update</button>
@@ -100,7 +100,55 @@
 
         {% endblock %}
     </div>
+</body> -->
+
+// Version 2
+
+<body>
+    {% extends "base.html" %}
+
+    {% block title %}Report Details{% endblock %}
+    <div class="container">
+        {% block content %}
+        <h1 class="mt-4">Report Details</h1>
+        <p><strong>Title:</strong> {{ report.title }}</p>
+        <p><strong>Date:</strong> {{ report.date }}</p>
+        <form method="POST">
+            <input type="text" id="searchInput" name="filter" placeholder="Search for items...">
+            <button type="submit" name="filter" value="filter">Filter</button>
+            <table class="table table-striped" id="reportTable">
+                <thead>
+                    <tr>
+                        {% for header in report.details[0] %}
+                        <th><button type="submit" name="sort" value="{{ header }}">{{ header }}</button></th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in report.details[1:] %}
+                    <tr>
+                        {% for cell in row %}
+                        {% if loop.index == 6 %}
+                        <td><input type="number" name="par-{{ loop.parent.index }}" value="{{ cell }}"></td>
+                        {% elif loop.index == 7 %}
+                        <td><input type="number" name="pos-{{ loop.parent.index }}" value="{{ cell }}"></td>
+                        {% else %}
+                        <td>{{ cell }}</td>
+                        {% endif %}
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button type="submit" name="update" value="update">Update</button>
+        </form>
+        <form method="POST" action="{{ url_for('delete_report_route', report_id=report.id) }}" style="display:inline;">
+            <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
+        {% endblock %}
+    </div>
 </body>
+
 
 </html>
 <!-- 
