@@ -12,4 +12,5 @@ __pycache__/
 *.bak
 *.tmp
 *.env
+* report_detail-v.01.html
 ```
