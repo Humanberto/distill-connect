@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -48,12 +47,12 @@
             </thead>
             <tbody>
                 {% for row in report.details[1:] %}
-                <tr>
+                <tr data-index="{{ loop.index0 }}">
                     {% for cell in row %}
                     {% if loop.index == 6 %}
-                    <td><input type="number" name="par-{{ loop.index }}" value="{{ cell }}" onchange="updateTotal({{ loop.parent.index }})"></td>
+                    <td><input type="number" name="par-{{ loop.parent.index0 }}" value="{{ cell }}" onchange="updateTotal({{ loop.parent.index0 }})"></td>
                     {% elif loop.index == 7 %}
-                    <td><input type="number" name="pos-{{ loop.index }}" value="{{ cell }}" onchange="updateTotal({{ loop.parent.index }})"></td>
+                    <td><input type="number" name="pos-{{ loop.parent.index0 }}" value="{{ cell }}" onchange="updateTotal({{ loop.parent.index0 }})"></td>
                     {% else %}
                     <td>{{ cell }}</td>
                     {% endif %}
@@ -119,10 +118,10 @@
     }
 
     function updateTotal(rowIndex) {
-        const row = document.querySelector(`#reportTable tbody tr:nth-child(${rowIndex + 1})`);
+        const row = document.querySelector(`#reportTable tbody tr[data-index="${rowIndex}"]`);
         const countCell = row.cells[4];
-        const parInput = row.querySelector(`input[name="par-${rowIndex + 1}"]`);
-        const posInput = row.querySelector(`input[name="pos-${rowIndex + 1}"]`);
+        const parInput = row.querySelector(`input[name="par-${rowIndex}"]`);
+        const posInput = row.querySelector(`input[name="pos-${rowIndex}"]`);
         const totalCell = row.cells[8];
 
         const count = parseFloat(countCell.innerText) || 0;
