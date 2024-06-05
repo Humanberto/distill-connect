@@ -10,31 +10,28 @@
             cursor: pointer;
             position: relative;
         }
-    
+
         th.sort-indicator {
             position: absolute;
             right: 8px;
             opacity: 0.5;
         }
-    
+
         th.sort-indicator.asc::before {
             content: '▲';
         }
-    
+
         th.sort-indicator.desc::before {
             content: '▼';
         }
-        </style>
+    </style>
 </head>
-
-// Version 2
 
 <body>
     {% extends "base.html" %}
 
     {% block content %}
     <div class="container">
-
         <h1 class="mt-4">Report Details</h1>
         <p><strong>Title:</strong> {{ report.title }}</p>
         <p><strong>Date:</strong> {{ report.date }}</p>
@@ -45,7 +42,9 @@
                 <thead>
                     <tr>
                         {% for header in report.details[0] %}
-                        <th><button type="submit" name="sort" value="{{ header }}">{{ header }}</button></th>
+                        <th>
+                            <button type="submit" name="sort" value="{{ header }}">{{ header }}</button>
+                        </th>
                         {% endfor %}
                     </tr>
                 </thead>
@@ -70,30 +69,8 @@
         <form method="POST" action="{{ url_for('delete_report_route', report_id=report.id) }}" style="display:inline;">
             <button type="submit" class="btn btn-danger">Delete</button>
         </form>
-        {% endblock %}
     </div>
+    {% endblock %}
 </body>
 
-
 </html>
-<!-- 
-<script>
-
-    // document.querySelectorAll('input').forEach(input => {
-    //     input.addEventListener('input', updateTotals);
-    // })
-    document.addEventListener('DOMContentLoaded', function () {
-        const parInputs = document.querySelectorAll('.par-input');
-        const posInputs = document.querySelectorAll('.pos-input');
-        const sortDirection = {};
-        const sortIndicators = {};
-
-        function updateTotals() {
-            parInputs.forEach((input, index) => {
-                const rowIndex = input.getAttribute('data-index');
-                const parValue = parseFloat(input.value) || 0;
-                const posValue = parseFloat(posInputs[index].value) || 0;
-                const countValue = parseFloat(document.querySelector(`tbody tr[data-index="${rowIndex}"] td:nth-child(5)`).innerText) || 0;
-                const totalCell = document.querySelector(`tbody tr[data-index="${rowIndex}"] td:nth-child(8)`);
-
-                // const totalCell =
