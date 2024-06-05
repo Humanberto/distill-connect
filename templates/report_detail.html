@@ -9,19 +9,19 @@
             cursor: pointer;
             position: relative;
         }
-    
         th.sort-indicator {
             position: absolute;
             right: 8px;
             opacity: 0.5;
         }
-    
         th.sort-indicator.asc::before {
             content: '▲';
         }
-    
         th.sort-indicator.desc::before {
             content: '▼';
+        }
+        .negative-total {
+            color: red;
         }
     </style>
 </head>
@@ -53,7 +53,7 @@
                     {% elif loop.index == 7 %}
                     <td><input type="number" name="pos-{{ loop.index0 }}" value="{{ cell }}" onchange="updateTotal({{ loop.index0 }})"></td>
                     {% else %}
-                    <td>{{ cell }}</td>
+                    <td class="total-cell">{{ cell }}</td>
                     {% endif %}
                     {% endfor %}
                 </tr>
@@ -97,10 +97,12 @@
 
     function updateSortIndicators(columnIndex) {
         const indicators = document.querySelectorAll('.sort-indicator');
-        indicators.forEach(indicator => indicator.innerText = '');
+        indicators.forEach(indicator => {
+            indicator.classList.remove('asc', 'desc');
+        });
 
         const currentIndicator = document.getElementById(`sortIndicator-${columnIndex}`);
-        currentIndicator.innerText = sortDirection ? '▲' : '▼';
+        currentIndicator.classList.add(sortDirection ? 'asc' : 'desc');
     }
 
     function filterTable() {
@@ -120,4 +122,20 @@
         const row = document.querySelector(`#reportTable tbody tr[data-index="${rowIndex}"]`);
         const countCell = row.cells[4];
         const parInput = row.querySelector(`input[name="par-${rowIndex}"]`);
-        const posInput = row.querySelector(`
+        const posInput = row.querySelector(`input[name="pos-${rowIndex}"]`);
+        const total = countCell.innerText - parInput.value - posInput.value;
+
+        const totalCell = row.querySelector('.total-cell');
+        totalCell.innerText = total;
+        if (total < 0) {
+            totalCell.classList.add('negative-total');
+        } else {
+            totalCell.classList.remove('negative-total');
+        }
+    }
+
+    function submitUpdates() {
+        // Implement the logic to submit updates if necessary
+    }
+</script>
+</html>
