@@ -205,11 +205,27 @@ Probably only about 20% is my work. But I did type it all in order to get used t
 # 
 # =============================================================================
 '''
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify
+import sqlite3
+import pandas as pd
+from datetime import datetime
+from sqlalchemy import create_engine
+from flask_sqlalchemy import SQLAlchemy
 import report_manager
 from report_manager import save_reports, load_reports, create_report, get_report, delete_report
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///reports.db'
+db = SQLAlchemy(app)
+DATABASE = 'reports.db'
+
+class Report(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(150), nullable=False)
+    date = db.Column(db.DateTime, default=datetime.utcnow)
+    details = db.Column(db.Text, nullable=False)
+
+
 
 @app.route('/')
 def home():
@@ -242,6 +258,30 @@ def report_detail(report_id):
             save_reports()
             
     return render_template('report_detail.html', report=report)
+
+
+
+def filter_item(report_id, item_search):
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM report_details WHERE report_id = ?', (report_id,))
+    rows = cursor.fetchall()
+    columns = [desc[0] for desc in cursor.description]
+    df = pd.DataFrame(rows, columns=columns)
+    df2 = df.set_index('ITEM:')
+    df_filtered = df2[df2.index.str.lower().str.contains(item_search.lower())]
+    conn.close()
+    return df_filtered.reset_index().to_dict(orient='records')
+
+
+@app.route('/filter_items', methods=['POST'])
+def filter_items():
+    data = request.get_json()
+    report_id = data['report_id']
+    item_search = data['item_search']
+    filtered_items = report_manager.filter_item(report_id, item_search)
+    return jsonify(filtered_items)
+
 
 
 
@@ -287,9 +327,11 @@ def create_report_route():
             return "Error processing file", 500
     return render_template('create_report.html')
 
+
 @app.route('/instructions')
 def instructions():
     return render_template('instructions.html')
+
 
 @app.route('/report/<int:report_id>/delete', methods=['POST'])
 def delete_report_route(report_id):
@@ -297,6 +339,7 @@ def delete_report_route(report_id):
     return redirect(url_for('view_reports'))
 
 if __name__ == '__main__':
+    db.create_all()
     app.run(debug=True)
 
 

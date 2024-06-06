@@ -9,6 +9,26 @@ DATE: June of 2024
 import pandas as pd
 from datetime import datetime
 import json
+from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+
+
+Base = declarative_base()
+DATABASE_URL = "sqlite:///reports.db"
+
+engine = create_engine(DATABASE_URL)
+Session = sessionmaker(bind=engine)
+session = Session()
+
+class Report(Base):
+    __tablename__ = 'reports'
+    id = Column(Integer, primary_key=True)
+    title = Column(String)
+    date = Column(DateTime)
+    details = Column(String)  # Store details as JSON string
+
+Base.metadata.create_all(engine)
 
 '''
 This section will manage the list of reports created.
@@ -100,9 +120,36 @@ def create_report(file):
     save_reports()
     return report, report_id
 
+    
+def filter_item(report_id, item_search):
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM report_details WHERE report_id = ?', (report_id,))
+    rows = cursor.fetchall()
+    columns = [desc[0] for desc in cursor.description]
+    df = pd.DataFrame(rows, columns=columns)
+    df2 = df.set_index('item')
+    df_filtered = df2[df2.index.str.lower().str.contains(item_search.lower())]
+    conn.close()
+    return df_filtered.reset_index().to_dict(orient='records')
+        
+# =============================================================================
+# def filter_item(report):
+
+#       df = report
+#     # df2 = df.set_index('ITEM:')
+#     # df2.sort_values(by='ITEM:', ascending=True)
+#     # item_search = input('Enter item: ').lower()
+#     # df_filtered = df2[df2.index.str.lower().str.contains(item_search)]
+#     # return df_filtered
+# 
+# =============================================================================
+
+
 '''
 locate report by id 
 '''       
+
 
 def get_report(report_id):
     return next((r for r in reports if r['id'] == report_id), None) # Learned this with the Mimo app. YAY!
