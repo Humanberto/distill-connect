@@ -19,7 +19,7 @@ Base = declarative_base()
 DATABASE = 'reports.db'
 
 
-engine = create_engine(DATABASE)
+engine = create_engine('sqlite:///./reports.db')
 Session = sessionmaker(bind=engine)
 session = Session()
 
