@@ -12,7 +12,6 @@ import json
 from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
 import report_manager
@@ -22,7 +21,7 @@ import sqlite3
 
 
 Base = declarative_base()
-DATABASE = 'reports.db'
+DATABASE_URL = "sqlite:///reports.db"
 
 
 engine = create_engine('sqlite:///./reports.db')
