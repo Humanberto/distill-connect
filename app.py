@@ -1,7 +1,7 @@
 
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 import report_manager
-from report_manager import save_reports, create_report, get_report, delete_report, filter_item
+from report_manager import save_reports, create_report, get_report, delete_report, filter_item, load_reports
 
 app = Flask(__name__)
 
@@ -13,7 +13,7 @@ def home():
 def view_reports():
     return render_template('view_reports.html', reports=report_manager.reports)
 
-@app.route('/report/<int:report_id>', methods=['GET', 'POST'])
+@app.route('/report/<string:report_id>', methods=['GET', 'POST'])
 def report_detail(report_id):
     report = get_report(report_id)
     if request.method == 'POST':
@@ -50,7 +50,7 @@ def create_report_route():
 def instructions():
     return render_template('instructions.html')
 
-@app.route('/report/<int:report_id>/delete', methods=['POST'])
+@app.route('/report/<string:report_id>/delete', methods=['POST'])
 def delete_report_route(report_id):
     delete_report(report_id)
     return redirect(url_for('view_reports'))
@@ -64,6 +64,7 @@ def filter_items():
     return jsonify(filtered_items)
 
 if __name__ == '__main__':
+    load_reports()
     app.run(debug=True)
 
 

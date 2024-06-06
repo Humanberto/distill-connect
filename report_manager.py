@@ -5,10 +5,12 @@ DATE: June of 2024
 
 '''
 
+
 import pandas as pd
 from datetime import datetime
 import json
 import sqlite3
+import uuid
 
 DATABASE_URL = "reports.db"
 REPORTS_FILE = 'reports.json'
@@ -17,7 +19,7 @@ def init_db():
     conn = sqlite3.connect(DATABASE_URL)
     cursor = conn.cursor()
     cursor.execute('''CREATE TABLE IF NOT EXISTS reports (
-                        id INTEGER PRIMARY KEY,
+                        id TEXT PRIMARY KEY,
                         title TEXT,
                         date TEXT,
                         details TEXT
@@ -25,12 +27,11 @@ def init_db():
     conn.commit()
     conn.close()
 
-def save_reports():
+def save_report(report):
     conn = sqlite3.connect(DATABASE_URL)
     cursor = conn.cursor()
-    for report in reports:
-        cursor.execute("INSERT INTO reports (id, title, date, details) VALUES (?, ?, ?, ?)", 
-                       (report['id'], report['title'], report['date'], json.dumps(report['details'])))
+    cursor.execute("INSERT INTO reports (id, title, date, details) VALUES (?, ?, ?, ?)", 
+                   (report['id'], report['title'], report['date'], json.dumps(report['details'])))
     conn.commit()
     conn.close()
 
@@ -44,7 +45,7 @@ def load_reports():
     reports = [{'id': row[0], 'title': row[1], 'date': row[2], 'details': json.loads(row[3])} for row in rows]
 
 def create_report(file):
-    report_id = len(reports) + 1
+    report_id = str(uuid.uuid4())  # Generate a unique ID
     try:
         df = pd.read_csv(file, header=5, usecols=['CATEGORY NAME:', 'ITEM:', 'BOTT. TYPE/SIZE:', 'LOCATION:', 'COUNT:'])
         df = df[df['CATEGORY NAME:'].str.contains('Finished Product', na=False)]
@@ -66,7 +67,7 @@ def create_report(file):
         'details': details
     }
     reports.append(report)
-    save_reports()
+    save_report(report)  # Save individual report
     return report, report_id
 
 def get_report(report_id):
@@ -106,6 +107,121 @@ def filter_item(report_id, item_search):
 # Initialize the database and load reports
 init_db()
 load_reports()
+
+
+
+
+
+
+'''
+# =============================================================================
+# Version 5??!
+# 
+# =============================================================================
+'''
+
+
+# import pandas as pd
+# from datetime import datetime
+# import json
+# import sqlite3
+
+# DATABASE_URL = "reports.db"
+# REPORTS_FILE = 'reports.json'
+
+# def init_db():
+#     conn = sqlite3.connect(DATABASE_URL)
+#     cursor = conn.cursor()
+#     cursor.execute('''CREATE TABLE IF NOT EXISTS reports (
+#                         id INTEGER PRIMARY KEY,
+#                         title TEXT,
+#                         date TEXT,
+#                         details TEXT
+#                       )''')
+#     conn.commit()
+#     conn.close()
+
+# def save_reports():
+#     conn = sqlite3.connect(DATABASE_URL)
+#     cursor = conn.cursor()
+#     for report in reports:
+#         cursor.execute("INSERT INTO reports (id, title, date, details) VALUES (?, ?, ?, ?)", 
+#                        (report['id'], report['title'], report['date'], json.dumps(report['details'])))
+#     conn.commit()
+#     conn.close()
+
+# def load_reports():
+#     global reports
+#     conn = sqlite3.connect(DATABASE_URL)
+#     cursor = conn.cursor()
+#     cursor.execute("SELECT * FROM reports")
+#     rows = cursor.fetchall()
+#     conn.close()
+#     reports = [{'id': row[0], 'title': row[1], 'date': row[2], 'details': json.loads(row[3])} for row in rows]
+
+# def create_report(file):
+#     report_id = len(reports) + 1
+#     try:
+#         df = pd.read_csv(file, header=5, usecols=['CATEGORY NAME:', 'ITEM:', 'BOTT. TYPE/SIZE:', 'LOCATION:', 'COUNT:'])
+#         df = df[df['CATEGORY NAME:'].str.contains('Finished Product', na=False)]
+#         df['COUNT:'] = pd.to_numeric(df['COUNT:'], errors='coerce').fillna(0).astype(int)
+#         df['PAR'] = 0
+#         df['POs'] = 0
+#         df['Total'] = df['COUNT:'] - df['PAR'] - df['POs']
+#         details = df.values.tolist()
+#         details.insert(0, df.columns.tolist())
+#     except Exception as e:
+#         print(f"Error reading csv file: {e}")
+#         return None
+
+#     report_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+#     report = {
+#         'id': report_id,
+#         'title': file.filename,
+#         'date': report_date,
+#         'details': details
+#     }
+#     reports.append(report)
+#     save_reports()
+#     return report, report_id
+
+# def get_report(report_id):
+#     conn = sqlite3.connect(DATABASE_URL)
+#     cursor = conn.cursor()
+#     cursor.execute("SELECT * FROM reports WHERE id=?", (report_id,))
+#     row = cursor.fetchone()
+#     conn.close()
+#     if row:
+#         return {'id': row[0], 'title': row[1], 'date': row[2], 'details': json.loads(row[3])}
+#     return None
+
+# def delete_report(report_id):
+#     global reports
+#     reports = [r for r in reports if r['id'] != report_id]
+#     conn = sqlite3.connect(DATABASE_URL)
+#     cursor = conn.cursor()
+#     cursor.execute("DELETE FROM reports WHERE id=?", (report_id,))
+#     conn.commit()
+#     conn.close()
+
+# def filter_item(report_id, item_search):
+#     conn = sqlite3.connect(DATABASE_URL)
+#     cursor = conn.cursor()
+#     cursor.execute('SELECT * FROM reports WHERE id = ?', (report_id,))
+#     row = cursor.fetchone()
+#     if row:
+#         columns = [desc[0] for desc in cursor.description]
+#         df = pd.DataFrame(json.loads(row[3]), columns=columns)
+#         df2 = df.set_index('ITEM:')
+#         df_filtered = df2[df2.index.str.lower().str.contains(item_search.lower())]
+#         conn.close()
+#         return df_filtered.reset_index().to_dict(orient='records')
+#     conn.close()
+#     return []
+
+# # Initialize the database and load reports
+# init_db()
+# load_reports()
 
 
 
