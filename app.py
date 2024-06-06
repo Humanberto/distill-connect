@@ -216,7 +216,8 @@ from report_manager import save_reports, load_reports, create_report, get_report
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///reports.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///./reports.db'
+
 db = SQLAlchemy(app)
 DATABASE = 'reports.db'
 
