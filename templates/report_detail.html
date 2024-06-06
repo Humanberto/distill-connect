@@ -75,6 +75,8 @@
         const table = document.getElementById("reportTable");
         const tbody = table.tBodies[0];
         const rows = Array.from(tbody.rows);
+        const sortDirection = table.dataset.sortDirection === 'asc' ? 'desc' : 'asc';
+        table.dataset.sortDirection = sortDirection;
 
         rows.sort((a, b) => {
             const cellA = a.cells[columnIndex].innerText;
@@ -90,6 +92,9 @@
             tbody.removeChild(tbody.firstChild);
         }
         rows.forEach(row => tbody.appendChild(row));
+        
+        document.querySelectorAll('.sort-indicator').forEach(el => el.className = 'sort-indicator');
+        document.getElementById(`sort-indicator-${columnIndex}`).className = `sort-indicator ${sortDirection}`;
 
         sortDirection = !sortDirection;
         updateSortIndicators(columnIndex);
@@ -109,6 +114,7 @@
         const input = document.getElementById("searchInput");
         const filter = input.value.toLowerCase();
         const table = document.getElementById("reportTable");
+        const tbody = table.tBodies[0];
         const rows = Array.from(table.tBodies[0].rows);
 
         rows.forEach(row => {
@@ -117,8 +123,21 @@
             row.style.display = match ? "" : "none";
         });
     }
+    
+    
+    function updateTotal(index) {
+        const parValue = parseFloat(document.querySelector(`input[name="par-${index}"]`).value) || 0;
+        const posValue = parseFloat(document.querySelector(`input[name="pos-${index}"]`).value) || 0;
+        const countValue = parseFloat(document.querySelector(`#reportTable tbody tr:nth-child(${index + 1}) td:nth-child(5)`).innerText) || 0;
+        const totalCell = document.querySelector(`#reportTable tbody tr:nth-child(${index + 1}) td:nth-child(8)`);
+        totalCell.innerText = countValue - parValue - posValue;
+        
+        // Persist changes with AJAX
+        persistChanges(rowIndex, par, pos, total);
+    }
 
-    function updateTotal(rowIndex) {
+    
+ /*   function updateTotal(rowIndex) {
         const row = document.querySelector(`#reportTable tbody tr[data-index="${rowIndex}"]`);
         const parInput = row.querySelector(`input[name="par-${rowIndex}"]`);
         const posInput = row.querySelector(`input[name="pos-${rowIndex}"]`);
@@ -137,7 +156,7 @@
 
         // Persist changes with AJAX
         persistChanges(rowIndex, par, pos, total);
-    }
+    }*/
 
     function persistChanges(rowIndex, par, pos, total) {
         const reportId = "{{ report.id }}";
