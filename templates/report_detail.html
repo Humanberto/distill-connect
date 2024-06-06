@@ -204,3 +204,129 @@ function updateTotal(index) {
 </script>
 </html>
 
+let sortDirection = true;
+
+    function sortTable(columnIndex) {
+        const table = document.getElementById("reportTable");
+        const tbody = table.tBodies[0];
+        const rows = Array.from(tbody.rows);
+        const currentDirection = table.dataset.sortDirection === 'asc' ? 'desc' : 'asc';
+        table.dataset.sortDirection = currentDirection;
+    
+        rows.sort((a, b) => {
+            const cellA = a.cells[columnIndex].innerText;
+            const cellB = b.cells[columnIndex].innerText;
+            if (currentDirection === 'asc') {
+                return cellA.localeCompare(cellB, undefined, { numeric: true });
+            } else {
+                return cellB.localeCompare(cellA, undefined, { numeric: true });
+            }
+    });
+
+    while (tbody.firstChild) {
+        tbody.removeChild(tbody.firstChild);
+    }
+    rows.forEach(row => tbody.appendChild(row));
+    
+    document.querySelectorAll('.sort-indicator').forEach(el => el.className = 'sort-indicator');
+    document.getElementById(`sortIndicator-${columnIndex}`).className = `sort-indicator ${currentDirection}`;
+
+    updateSortIndicators(columnIndex);
+}
+
+
+    function updateSortIndicators(columnIndex) {
+        const indicators = document.querySelectorAll('.sort-indicator');
+        indicators.forEach(indicator => {
+            indicator.classList.remove('asc', 'desc');
+        });
+
+        const currentIndicator = document.getElementById(`sortIndicator-${columnIndex}`);
+        currentIndicator.classList.add(sortDirection ? 'asc' : 'desc');
+    }
+
+   
+    
+function updateTotal(index) {
+    const parValue = parseFloat(document.querySelector(`input[name="par-${index}"]`).value) || 0;
+    const posValue = parseFloat(document.querySelector(`input[name="pos-${index}"]`).value) || 0;
+    const countValue = parseFloat(document.querySelector(`#reportTable tbody tr:nth-child(${index + 1}) td:nth-child(5)`).innerText) || 0;
+    const totalCell = document.querySelector(`#reportTable tbody tr:nth-child(${index + 1}) td:nth-child(8)`);
+    const total = countValue - parValue - posValue;
+    totalCell.innerText = total;
+    persistChanges(index, parValue, posValue, total);
+}
+
+
+
+    
+ /*   function updateTotal(rowIndex) {
+        const row = document.querySelector(`#reportTable tbody tr[data-index="${rowIndex}"]`);
+        const parInput = row.querySelector(`input[name="par-${rowIndex}"]`);
+        const posInput = row.querySelector(`input[name="pos-${rowIndex}"]`);
+        const count = parseInt(row.cells[4].innerText) || 0;
+        const par = parseInt(parInput.value) || 0;
+        const pos = parseInt(posInput.value) || 0;
+        const total = count - par - pos;
+
+        const totalCell = row.querySelector('td:nth-child(8)');
+        totalCell.innerText = total;
+        if (total < 0) {
+            totalCell.classList.add('negative-total');
+        } else {
+            totalCell.classList.remove('negative-total');
+        }
+
+        // Persist changes with AJAX
+        persistChanges(rowIndex, par, pos, total);
+    }*/
+
+    function persistChanges(rowIndex, par, pos, total) {
+        const reportId = "{{ report.id }}";
+        fetch(`/update_report/${reportId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                rowIndex: rowIndex,
+                par: par,
+                pos: pos,
+                total: total
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status !== 'success') {
+                console.error('Failed to persist changes:', data.message);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+    
+    
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+    const searchInput = document.getElementById('searchInput').value;
+    const reportId = "{{ report.id }}";
+    fetch('/filter_items', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ report_id: reportId, item_search: searchInput }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        const tbody = document.querySelector('#reportTable tbody');
+        tbody.innerHTML = '';
+        data.forEach(row => {
+            const tr = document.createElement('tr');
+            row.forEach(cell => {
+                const td = document.createElement('td');
+                td.textContent = cell;
+                tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+        });
+    });
+});
