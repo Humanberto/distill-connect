@@ -63,6 +63,7 @@
         <form method="POST" action="{{ url_for('delete_report_route', report_id=report.id) }}" style="display:inline;">
             <button type="submit" class="btn btn-danger">Delete</button>
         </form>
+        <button onclick="window.print()" class="btn btn-primary">Print</button>
     </div>
     {% endblock %}
 </body>
