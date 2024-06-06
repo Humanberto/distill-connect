@@ -50,9 +50,9 @@
                 <tr data-index="{{ loop.index0 }}">
                     {% for cell in row %}
                     {% if loop.index == 6 %}
-                    <td><input type="number" name="par-{{ loop.parent.index0 }}" value="{{ cell }}" oninput="updateTotal({{ loop.parent.index0 }})"></td>
+                    <td><input type="number" name="par-{{ loop.index0 }}" value="{{ cell }}" oninput="updateTotal({{ loop.index0 }})"></td>
                     {% elif loop.index == 7 %}
-                    <td><input type="number" name="pos-{{ loop.parent.index0 }}" value="{{ cell }}" oninput="updateTotal({{ loop.parent.index0 }})"></td>
+                    <td><input type="number" name="pos-{{ loop.index0 }}" value="{{ cell }}" oninput="updateTotal({{ loop.index0 }})"></td>
                     {% else %}
                     <td>{{ cell }}</td>
                     {% endif %}
@@ -115,12 +115,12 @@
    
     
     function updateTotal(index) {
-    const parValue = parseFloat(document.querySelector(`input[name="par-${index}"]`).value) || 0;
-    const posValue = parseFloat(document.querySelector(`input[name="pos-${index}"]`).value) || 0;
-    const countValue = parseFloat(document.querySelector(`#reportTable tbody tr:nth-child(${index + 1}) td:nth-child(5)`).innerText) || 0;
-    const totalCell = document.querySelector(`#reportTable tbody tr:nth-child(${index + 1}) td:nth-child(8)`);
-    const total = countValue - parValue - posValue;
-    totalCell.innerText = total;
+        const parValue = parseFloat(document.querySelector(`input[name="par-${index}"]`).value) || 0;
+        const posValue = parseFloat(document.querySelector(`input[name="pos-${index}"]`).value) || 0;
+        const countValue = parseFloat(document.querySelector(`#reportTable tbody tr:nth-child(${index + 1}) td:nth-child(5)`).innerText) || 0;
+        const totalCell = document.querySelector(`#reportTable tbody tr:nth-child(${index + 1}) td:nth-child(8)`);
+        const total = countValue - parValue - posValue;
+        totalCell.innerText = total;
     
     // Persist changes with AJAX
     persistChanges(index, parValue, posValue, total);
