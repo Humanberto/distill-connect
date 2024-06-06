@@ -50,11 +50,7 @@
                 <tr data-index="{{ loop.index0 }}">
                     {% for cell in row %}
                     {% if loop.index == 6 %}
-                    
-                    <td><input type="number" name="par-{{ loop.index0 }}" value="{{ cell }}" oninput="updateTotal({{ loop.index0 }})"></td>
-                    <td><input type="number" name="pos-{{ loop.index0 }}" value="{{ cell }}" oninput="updateTotal({{ loop.index0 }})"></td>
-
-                    
+ 
                     <td><input type="number" name="par-{{ loop.index0 }}" value="{{ cell }}" oninput="updateTotal({{ loop.index0 }})"></td>
                     {% elif loop.index == 7 %}
                     <td><input type="number" name="pos-{{ loop.index0 }}" value="{{ cell }}" oninput="updateTotal({{ loop.index0 }})"></td>
