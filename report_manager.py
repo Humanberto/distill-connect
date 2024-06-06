@@ -12,6 +12,12 @@ import json
 from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+
+from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask_sqlalchemy import SQLAlchemy
+import report_manager
+from report_manager import save_reports, load_reports, create_report, get_report, delete_report
+
 import sqlite3
 
 
