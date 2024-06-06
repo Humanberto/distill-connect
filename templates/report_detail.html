@@ -50,6 +50,11 @@
                 <tr data-index="{{ loop.index0 }}">
                     {% for cell in row %}
                     {% if loop.index == 6 %}
+                    
+                    <td><input type="number" name="par-{{ loop.index0 }}" value="{{ cell }}" oninput="updateTotal({{ loop.index0 }})"></td>
+                    <td><input type="number" name="pos-{{ loop.index0 }}" value="{{ cell }}" oninput="updateTotal({{ loop.index0 }})"></td>
+
+                    
                     <td><input type="number" name="par-{{ loop.index0 }}" value="{{ cell }}" oninput="updateTotal({{ loop.index0 }})"></td>
                     {% elif loop.index == 7 %}
                     <td><input type="number" name="pos-{{ loop.index0 }}" value="{{ cell }}" oninput="updateTotal({{ loop.index0 }})"></td>
@@ -74,20 +79,20 @@
     let sortDirection = true;
 
     function sortTable(columnIndex) {
-    const table = document.getElementById("reportTable");
-    const tbody = table.tBodies[0];
-    const rows = Array.from(tbody.rows);
-    const currentDirection = table.dataset.sortDirection === 'asc' ? 'desc' : 'asc';
-    table.dataset.sortDirection = currentDirection;
-
-    rows.sort((a, b) => {
-        const cellA = a.cells[columnIndex].innerText;
-        const cellB = b.cells[columnIndex].innerText;
-        if (currentDirection === 'asc') {
-            return cellA.localeCompare(cellB, undefined, { numeric: true });
-        } else {
-            return cellB.localeCompare(cellA, undefined, { numeric: true });
-        }
+        const table = document.getElementById("reportTable");
+        const tbody = table.tBodies[0];
+        const rows = Array.from(tbody.rows);
+        const currentDirection = table.dataset.sortDirection === 'asc' ? 'desc' : 'asc';
+        table.dataset.sortDirection = currentDirection;
+    
+        rows.sort((a, b) => {
+            const cellA = a.cells[columnIndex].innerText;
+            const cellB = b.cells[columnIndex].innerText;
+            if (currentDirection === 'asc') {
+                return cellA.localeCompare(cellB, undefined, { numeric: true });
+            } else {
+                return cellB.localeCompare(cellA, undefined, { numeric: true });
+            }
     });
 
     while (tbody.firstChild) {
@@ -114,17 +119,16 @@
 
    
     
-    function updateTotal(index) {
-        const parValue = parseFloat(document.querySelector(`input[name="par-${index}"]`).value) || 0;
-        const posValue = parseFloat(document.querySelector(`input[name="pos-${index}"]`).value) || 0;
-        const countValue = parseFloat(document.querySelector(`#reportTable tbody tr:nth-child(${index + 1}) td:nth-child(5)`).innerText) || 0;
-        const totalCell = document.querySelector(`#reportTable tbody tr:nth-child(${index + 1}) td:nth-child(8)`);
-        const total = countValue - parValue - posValue;
-        totalCell.innerText = total;
-    
-    // Persist changes with AJAX
+function updateTotal(index) {
+    const parValue = parseFloat(document.querySelector(`input[name="par-${index}"]`).value) || 0;
+    const posValue = parseFloat(document.querySelector(`input[name="pos-${index}"]`).value) || 0;
+    const countValue = parseFloat(document.querySelector(`#reportTable tbody tr:nth-child(${index + 1}) td:nth-child(5)`).innerText) || 0;
+    const totalCell = document.querySelector(`#reportTable tbody tr:nth-child(${index + 1}) td:nth-child(8)`);
+    const total = countValue - parValue - posValue;
+    totalCell.innerText = total;
     persistChanges(index, parValue, posValue, total);
 }
+
 
 
     

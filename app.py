@@ -212,7 +212,8 @@ from datetime import datetime
 from sqlalchemy import create_engine
 from flask_sqlalchemy import SQLAlchemy
 import report_manager
-from report_manager import save_reports, load_reports, create_report, get_report, delete_report
+from report_manager import save_reports, load_reports, create_report, get_report, delete_report, filter_item
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///reports.db'
@@ -256,7 +257,6 @@ def report_detail(report_id):
                 report['details'][i][7] = pos
                 report['details'][i][8] = report['details'][i][4] - par - pos
             save_reports()
-            
     return render_template('report_detail.html', report=report)
 
 

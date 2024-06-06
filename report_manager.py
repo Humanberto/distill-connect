@@ -12,12 +12,14 @@ import json
 from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+import sqlite3
 
 
 Base = declarative_base()
-DATABASE_URL = "sqlite:///reports.db"
+DATABASE = 'reports.db'
 
-engine = create_engine(DATABASE_URL)
+
+engine = create_engine(DATABASE)
 Session = sessionmaker(bind=engine)
 session = Session()
 
@@ -128,10 +130,11 @@ def filter_item(report_id, item_search):
     rows = cursor.fetchall()
     columns = [desc[0] for desc in cursor.description]
     df = pd.DataFrame(rows, columns=columns)
-    df2 = df.set_index('item')
+    df2 = df.set_index('ITEM:')
     df_filtered = df2[df2.index.str.lower().str.contains(item_search.lower())]
     conn.close()
     return df_filtered.reset_index().to_dict(orient='records')
+
         
 # =============================================================================
 # def filter_item(report):
