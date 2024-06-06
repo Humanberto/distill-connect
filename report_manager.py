@@ -27,13 +27,15 @@ def init_db():
     conn.commit()
     conn.close()
 
-def save_report(report):
+def save_reports():
     conn = sqlite3.connect(DATABASE_URL)
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO reports (id, title, date, details) VALUES (?, ?, ?, ?)", 
-                   (report['id'], report['title'], report['date'], json.dumps(report['details'])))
+    for report in reports:
+        cursor.execute("INSERT INTO reports (id, title, date, details) VALUES (?, ?, ?, ?)",
+                       (report['id'], report['title'], report['date'], json.dumps(report['details'])))
     conn.commit()
     conn.close()
+
 
 def load_reports():
     global reports
