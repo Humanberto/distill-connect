@@ -122,6 +122,7 @@ def create_report(file):
 #     return report, report_id
 # =============================================================================
 
+
 def get_report(report_id):
     conn = sqlite3.connect(DATABASE_URL)
     cursor = conn.cursor()
@@ -132,6 +133,20 @@ def get_report(report_id):
         return {'id': row[0], 'title': row[1], 'date': row[2], 'details': json.loads(row[3])}
     return None
 
+
+
+# =============================================================================
+# def get_report(report_id):
+#     conn = sqlite3.connect(DATABASE_URL)
+#     cursor = conn.cursor()
+#     cursor.execute("SELECT * FROM reports WHERE id=?", (report_id,))
+#     row = cursor.fetchone()
+#     conn.close()
+#     if row:
+#         return {'id': row[0], 'title': row[1], 'date': row[2], 'details': json.loads(row[3])}
+#     return None
+# 
+# =============================================================================
 def delete_report(report_id):
     global reports
     reports = [r for r in reports if r['id'] != report_id]

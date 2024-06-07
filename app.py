@@ -13,26 +13,37 @@ def home():
 def view_reports():
     return render_template('view_reports.html', reports=report_manager.reports)
 
-@app.route('/report/<string:report_id>', methods=['GET', 'POST'])
+# =============================================================================
+# @app.route('/report/<string:report_id>', methods=['GET', 'POST'])
+# def report_detail(report_id):
+#     report = get_report(report_id)
+#     if request.method == 'POST':
+#         if 'sort' in request.form:
+#             sort_by = request.form['sort']
+#             sort_index = report['details'][0].index(sort_by)
+#             report['details'] = [report['details'][0]] + sorted(report['details'][1:], key=lambda x: x[sort_index])
+#         elif 'filter' in request.form:
+#             filter_term = request.form['filter']
+#             report['details'] = [report['details'][0]] + [row for row in report['details'][1:] if filter_term.lower() in str(row).lower()]
+#         else:
+#             for i, row in enumerate(report['details'][1:], start=1):
+#                 par = request.form.get(f'par-{i}', type=int, default=0)
+#                 pos = request.form.get(f'pos-{i}', type=int, default=0)
+#                 report['details'][i][6] = par
+#                 report['details'][i][7] = pos
+#                 report['details'][i][8] = report['details'][i][4] - par - pos
+#             save_reports()
+#     return render_template('report_detail.html', report=report)
+# =============================================================================
+
+
+@app.route('/report/<report_id>')
 def report_detail(report_id):
     report = get_report(report_id)
-    if request.method == 'POST':
-        if 'sort' in request.form:
-            sort_by = request.form['sort']
-            sort_index = report['details'][0].index(sort_by)
-            report['details'] = [report['details'][0]] + sorted(report['details'][1:], key=lambda x: x[sort_index])
-        elif 'filter' in request.form:
-            filter_term = request.form['filter']
-            report['details'] = [report['details'][0]] + [row for row in report['details'][1:] if filter_term.lower() in str(row).lower()]
-        else:
-            for i, row in enumerate(report['details'][1:], start=1):
-                par = request.form.get(f'par-{i}', type=int, default=0)
-                pos = request.form.get(f'pos-{i}', type=int, default=0)
-                report['details'][i][6] = par
-                report['details'][i][7] = pos
-                report['details'][i][8] = report['details'][i][4] - par - pos
-            save_reports()
+    if report is None:
+        return render_template('404.html'), 404  # Render a 404 page if the report is not found
     return render_template('report_detail.html', report=report)
+#-----
 
 @app.route('/create', methods=['GET', 'POST'])
 def create_report_route():
