@@ -69,7 +69,7 @@ def create_report(file):
         'details': details
     }
     reports.append(report)
-    save_report(report)  # Save individual report
+    save_reports(report)  # Save individual report
     return report, report_id
 
 def get_report(report_id):
