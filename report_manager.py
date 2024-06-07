@@ -14,6 +14,7 @@ import uuid
 
 DATABASE_URL = "reports.db"
 REPORTS_FILE = 'reports.json'
+reports = []
 
 def init_db():
     conn = sqlite3.connect(DATABASE_URL)
@@ -27,14 +28,31 @@ def init_db():
     conn.commit()
     conn.close()
 
+# =============================================================================
+# def save_reports():
+#     conn = sqlite3.connect(DATABASE_URL)
+#     cursor = conn.cursor()
+#     for report in reports:
+#         cursor.execute("INSERT INTO reports (id, title, date, details) VALUES (?, ?, ?, ?)",
+#                        (report['id' +1], report['title'], report['date'], json.dumps(report['details'])))
+#     conn.commit()
+#     conn.close()
+# 
+# =============================================================================
+
+
 def save_reports():
     conn = sqlite3.connect(DATABASE_URL)
     cursor = conn.cursor()
     for report in reports:
-        cursor.execute("INSERT INTO reports (id, title, date, details) VALUES (?, ?, ?, ?)",
-                       (report['id'], report['title'], report['date'], json.dumps(report['details'])))
+        try:
+            cursor.execute("INSERT INTO reports (id, title, date, details) VALUES (?, ?, ?, ?)",
+                           (report['id'], report['title'], report['date'], json.dumps(report['details'])))
+        except sqlite3.IntegrityError:
+            print(f"Report with ID {report['id']} already exists. Skipping insertion.")
     conn.commit()
     conn.close()
+
 
 
 def load_reports():
@@ -45,6 +63,8 @@ def load_reports():
     rows = cursor.fetchall()
     conn.close()
     reports = [{'id': row[0], 'title': row[1], 'date': row[2], 'details': json.loads(row[3])} for row in rows]
+
+
 
 def create_report(file):
     report_id = str(uuid.uuid4())  # Generate a unique ID
@@ -71,6 +91,36 @@ def create_report(file):
     reports.append(report)
     save_reports()  # Save individual report
     return report, report_id
+
+
+# =============================================================================
+# 
+# def create_report(file):
+#     report_id = str(uuid.uuid4())  # Generate a unique ID
+#     try:
+#         df = pd.read_csv(file, header=5, usecols=['CATEGORY NAME:', 'ITEM:', 'BOTT. TYPE/SIZE:', 'LOCATION:', 'COUNT:'])
+#         df = df[df['CATEGORY NAME:'].str.contains('Finished Product', na=False)]
+#         df['COUNT:'] = pd.to_numeric(df['COUNT:'], errors='coerce').fillna(0).astype(int)
+#         df['PAR'] = 0
+#         df['POs'] = 0
+#         df['Total'] = df['COUNT:'] - df['PAR'] - df['POs']
+#         details = df.values.tolist()
+#         details.insert(0, df.columns.tolist())
+#     except Exception as e:
+#         print(f"Error reading csv file: {e}")
+#         return None
+# 
+#     report_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+#     report = {
+#         'id': report_id,
+#         'title': file.filename,
+#         'date': report_date,
+#         'details': details
+#     }
+#     reports.append(report)
+#     save_reports()  # Save individual report
+#     return report, report_id
+# =============================================================================
 
 def get_report(report_id):
     conn = sqlite3.connect(DATABASE_URL)
